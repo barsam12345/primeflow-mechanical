@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Exercise Library</title>
+  <link rel="stylesheet" href="https://cdn.datatables.net/2.0.5/css/dataTables.dataTables.min.css">
+  <style>
+    body{font-family:system-ui, sans-serif; margin:2rem;}
+    #selectedBox{border:1px solid #ccc; padding:1rem; margin-top:1rem;}
+    .btn{padding:.4rem .8rem; border:1px solid #222; cursor:pointer;}
+  </style>
+</head>
+<body>
+
+<h1>Exercise Library</h1>
+
+<table id="exTable" class="display" style="width:100%">
+  <thead>
+    <tr>
+      <th>Select</th>
+      <th>Name</th>
+      <th>Category</th>
+      <th>Equipment</th>
+      <th>Primary Muscle</th>
+      <th>Description</th>
+      <th>Video</th>
+    </tr>
+  </thead>
+</table>
+
+<button id="shareBtn" class="btn">Generate shareable link</button>
+
+<div id="selectedBox"></div>
+
+<script src="https://cdn.datatables.net/2.0.5/js/dataTables.min.js"></script>
+<script>
+(async () => {
+  const data = await (await fetch('exercises.json')).json();
+  const table = new DataTable('#exTable', {
+    data,
+    columns: [
+      {data: null, render: (_,__,row) =>
+        `<input type="checkbox" class="pick" data-id="${row.id}">`},
+      {data: 'ExerciseName'},
+      {data: 'Category'},
+      {data: 'Equipment'},
+      {data: 'PrimaryMuscle'},
+      {data: 'Description'},
+      {data: 'VideoURL', render: url => url ? `<a href="${url}" target="_blank">video</a>` : ''}
+    ],
+    pageLength: 25
+  });
+
+  const selBox = document.getElementById('selectedBox');
+  document.getElementById('shareBtn').onclick = () => {
+    const ids = [...document.querySelectorAll('.pick:checked')]
+                .map(cb => cb.dataset.id);
+    if(!ids.length){alert('Pick at least one exercise.'); return;}
+    const link = location.origin + location.pathname + 'client.html#' + ids.join(',');
+    selBox.innerHTML = `<p>Copy this link to send to the client:</p><input style="width:100%" value="${link}" readonly>`;
+  };
+})();
+</script>
+</body>
+</html> 

@@ -1,0 +1,21 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><title>Your Exercises</title>
+<style>body{font-family:system-ui;margin:2rem;} .ex{margin-bottom:1.5rem;}</style>
+</head><body>
+<h1>Your Exercises</h1><div id="wrap">Loading…</div>
+<script>
+(async () => {
+  const all = await (await fetch('exercises.json')).json();
+  const ids = location.hash.slice(1).split(',');
+  const chosen = all.filter(x => ids.includes(String(x.id)));
+  const wrap = document.getElementById('wrap');
+  if(!chosen.length){wrap.textContent='No exercises found.';return;}
+  wrap.innerHTML = chosen.map(ex =>
+    `<div class="ex">
+       <h2>${ex.ExerciseName}</h2>
+       <p><strong>Primary muscle:</strong> ${ex.PrimaryMuscle}</p>
+       <p>${ex.Description}</p>
+       ${ex.VideoURL ? `<iframe width="420" height="236" src="${ex.VideoURL.replace('watch?v=','embed/')}" frameborder="0" allowfullscreen></iframe>` : ''}
+     </div>`).join('');
+})();
+</script></body></html> 
